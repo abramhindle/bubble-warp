@@ -34,17 +34,16 @@ SynthDef(\splayer, {
 Synth(\splayer,[\buf,~pops.choose]);
 
 
-
-~splayer.(buf: ~crinkles.choose);
+Synth(\splayer,[\buf, ~crinkles.choose]);
 fork {
-	100.do{~splayer.(buf: ~pops.choose); 0.05.wait;};
+	100.do{Synth(\splayer,[\buf, ~pops.choose]); 0.05.wait;};
 };
-~splayer.(buf: ~scratches.choose, rate: 0.9 + (0.5.rand));
-~splayer.(buf: ~scratches.choose, looping: 1, rate: 0.9 + (0.5.rand));
-~splayer.(buf: ~crinkles.choose, looping: 1, rate: 0.9 + (0.5.rand));
+Synth(\splayer,[buf: ~scratches.choose, rate: 0.9 + (0.5.rand)]);
+Synth(\splayer,[buf: ~scratches.choose, looping: 1, rate: 0.9 + (0.5.rand)]);
+Synth(\splayer,[buf: ~crinkles.choose, looping: 1, rate: 0.9 + (0.5.rand)]);
 
 ~silences.do{|silence| 
-	~splayer.(buf: silence, rate: 0.3+1.0.rand, looping: 1);
+	Synth(\splayer,[buf: silence, rate: 0.3+1.0.rand, looping: 1]);
 };
 
 ~loopall = {
@@ -58,19 +57,10 @@ fork {
 };
 
 4.do {
-  ~loopall.( ~silences, {|x| ~splayer.(buf: x, rate: 0.3+1.0.rand) });
+  ~loopall.( ~silences, {|x| Synth(\splayer,[buf: x, rate: 0.3+1.0.rand]); });
 }
-~loopall.( ~crinkles, {|x| ~splayer.(buf: x, rate: 0.3+1.0.rand) });
-~loopall.( ~scratches, {|x| ~splayer.(buf: x, rate: 0.3+1.0.rand) });
-~loopall.( ~pops, {|x| ~splayer.(buf: x, rate: 0.3+1.0.rand) });
-
-4.do{
-	Routine {
-		0.1.rand.wait;
-		loop {
-			~splayer.(buf: (~silences).choose, rate: 0.3+1.0.rand).waitForFree;
-		}
-	}.play;
-};
+~loopall.( ~crinkles, {|x| Synth(\splayer,[buf: x, rate: 0.3+1.0.rand]) });
+~loopall.( ~scratches, {|x| Synth(\splayer,[buf: x, rate: 0.3+1.0.rand]) });
+~loopall.( ~pops, {|x| Synth(\splayer,[buf: x, rate: 0.3+1.0.rand]) });
 
 /* pop osc responder */
