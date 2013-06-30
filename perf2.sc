@@ -71,6 +71,7 @@ y.map(\m,~v)
 {|x| x.fullPath}.(~paths.files)
 ~paths.files[1].fullPath.match("crinkle")
 ~paths.files.collect(
+"./wavs/crinkle-*wav".pathMatch
 
 ~additive = {
    var f = {
