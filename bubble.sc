@@ -15,13 +15,7 @@ s.scope;
 	{
 		var myrate, trigger, frames, myvol;
 		myvol = ~bal.(); 
-		/* frames = buf.numFrames; */
-		/* myrate = 1.0*rate; */
-		/* [rate*1.0,rate*1.0]; */
-		/* trigger = Impulse.kr(rate); */
-		/* frames*Line.kr(0,1,10)) * */
 		amp * myvol * PlayBuf.ar(1, buf, rate, 1, 0, looping, 2); 
-	/* * EnvGen.kr(Env.linen(0.01,0.96,0.01), trigger) * rate; */
 	}.play();
 };
 
@@ -32,30 +26,14 @@ SynthDef(\splayer, {
 		var y = 1.0.rand;
 		[1.0 - y, y]
 	};
-	Out.ar(0,
-		PlayBuf.ar(1, buf, 1, 1, 0, 0, 2)
-	);
-}).add;
-Synth(\splayer,[\buf,~pops.choose]);
-
-SynthDef(\splayer, {
-	arg buf, out=0, rate=1.0, looping=0, amp=1.0 ;
-	var myrate, trigger, frames, myvol, bal;
-	bal = {
-		var y = 1.0.rand;
-		[1.0 - y, y]
-	};
 	myvol = bal.(); 
-	/* frames = buf.numFrames; */
-		/* myrate = 1.0*rate; */
-		/* [rate*1.0,rate*1.0]; */
-		/* trigger = Impulse.kr(rate); */
-		/* frames*Line.kr(0,1,10)) * */
-		/* * EnvGen.kr(Env.linen(0.01,0.96,0.01), trigger) * rate; */
 	Out.ar(0,
 		amp * myvol * PlayBuf.ar(1, buf, rate, 1, 0, looping, 2)
 	);
 }).add;
+Synth(\splayer,[\buf,~pops.choose]);
+
+
 
 ~splayer.(buf: ~crinkles.choose);
 fork {
@@ -94,5 +72,5 @@ fork {
 		}
 	}.play;
 };
-/* ~splayer.(buf: ~silences.choose, rate: 0.9 + (0.2.rand), looping: 1); */
+
 /* pop osc responder */
