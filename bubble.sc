@@ -49,8 +49,8 @@ SynthDef(\splayer, {
 };
 ~scratchf = {
 	arg since=1000;
-	var amp = ~since.(since);
-	Synth(\splayer,[buf: ~scratches.choose, rate: 0.9 + (0.5.rand), amp: amp ]);
+	var amp = 1.0.min(2.0 * (~since.(since)));
+	Synth(\splayer,[buf: ~scratches.choose, rate: 0.9 + (0.3.rand), amp: amp ]);
 };
 // ~scratchf.();
 // ~scratchf.(since: 10);
@@ -66,13 +66,15 @@ SynthDef(\splayer, {
 ~crinklef = {
 	arg since=1000;
 	var amp = ~since.(since);
-	Synth(\splayer,[buf: ~crinkles.choose, rate: 0.9 + (0.5.rand), amp: amp]);
+	Synth(\splayer,[buf: ~crinkles.choose, rate: 0.9 + (0.5.rand), amp: 0.5*amp]);
 };
 
-~popexplosion = Routine {
-	fork {
-		1000.do{Synth(\splayer,[\buf, ~pops.choose]); 0.05.wait;};
-	};
+~popexplosion = {
+	Routine {
+		fork {
+			1000.do{Synth(\splayer,[\buf, ~pops.choose]); 0.05.wait;};
+		};
+	}.play();
 };
 // ~popexplosion.();
 
@@ -144,11 +146,6 @@ o.crinkle = OSCresponderNode(n, '/crinkle',
 		~crinklef.(since: since);
 	}
 ).add;
-o.scratch = OSCresponderNode(n, '/scratch',
-	{ arg t, r, msg;
-		msg.postln;
-		msg[3].postln;
-	}).add;
 
 o.m.sendBundle(0.0, ["/scratch"], ["/scratch"], ["/scratch"]  );
 o.m.sendBundle(0.0, ["/crinkle"], ["/crinkle"], ["/crinkle"]  );
@@ -167,12 +164,18 @@ o.pops.remove;
 
 */
 
+
+
+/* eval this at the start of the performance */
+
 // Change this to 840
 r = Routine {
     780.0.wait;
     "Splotion".postln;
     ~popexplosion.().yield;
 }.play;
+
+
 fork {
     loop {
         30.0.rand.wait;
@@ -180,10 +183,12 @@ fork {
 	}
 };
 
-/* make osc webservice */
-/* make UI */
-/* make DVD */
-/* improve graphics */
+/* [X] make osc webservice */
+/* [X] make UI */
+/* [X] improve graphics */
+/* [ ] make Video */
+/* [ ] Burn DVD */
+/* [ ] Test Network */
 /* */
 
 
