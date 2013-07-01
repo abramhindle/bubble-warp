@@ -2,16 +2,15 @@ s.options.memSize = 650000;
 s.boot;
 s.scope;
 
+~bal = {
+	var y = 1.0.rand;
+	[1.0 - y, y]
+};
 SynthDef(\splayer, {
-	arg buf, out=0, rate=1.0, looping=0, amp=1.0 ;
-	var myrate, trigger, frames, myvol, bal;
-	bal = {
-		var y = 1.0.rand;
-		[1.0 - y, y]
-	};
-	myvol = bal.(); 
+	arg buf, out=0, rate=1.0, looping=0, amp=1.0, myvol=[0.5,0.5];
+	var myrate, trigger, frames,y;
 	Out.ar(0,
-		amp * myvol * PlayBuf.ar(1, buf, rate, 1, 0, looping, 2)
+		myvol * [amp,amp] * PlayBuf.ar(1, buf, [rate,rate], 1, 0, looping, 2)
 	);
 }).add;
 ~crinkles = "./wavs/crinkle*wav".pathMatch.collect({arg path; Buffer.read(s,path)});
@@ -21,11 +20,6 @@ SynthDef(\splayer, {
 
 
 
-
-~bal = {
-	var y = 1.0.rand;
-	[1.0 - y, y]
-};
 
 ~splayer = {
 	arg buf, rate=1.0, looping=0, amp=1.0;
@@ -45,12 +39,13 @@ SynthDef(\splayer, {
 
 
 ~popf = {
-	Synth(\splayer,[\buf,~pops.choose]);
+	var myvol = ~bal.();
+	Synth(\splayer,[\buf,~pops.choose,\myvol,myvol]);
 };
 ~scratchf = {
 	arg since=1000;
-	var amp = 1.0.min(2.0 * (~since.(since)));
-	Synth(\splayer,[buf: ~scratches.choose, rate: 0.9 + (0.3.rand), amp: amp ]);
+	var amp = 1.0.min(2.0 * (~since.(since))), myvol = ~bal.();
+	Synth(\splayer,[buf: ~scratches.choose, rate: 0.9 + (0.3.rand), amp: amp, myvol: myvol ]);
 };
 // ~scratchf.();
 // ~scratchf.(since: 10);
@@ -65,14 +60,16 @@ SynthDef(\splayer, {
 
 ~crinklef = {
 	arg since=1000;
-	var amp = ~since.(since);
-	Synth(\splayer,[buf: ~crinkles.choose, rate: 0.9 + (0.5.rand), amp: 0.5*amp]);
+	var amp = ~since.(since), myvol = ~bal.();
+	myvol.postln;
+	Synth(\splayer,[buf: ~crinkles.choose, rate: 0.9 + (0.5.rand), amp: 0.5*amp, myvol: myvol]);
 };
 
 ~popexplosion = {
 	Routine {
 		fork {
-			1000.do{Synth(\splayer,[\buf, ~pops.choose]); 0.05.wait;};
+			1000.do{
+				Synth(\splayer,[\buf, ~pops.choose]); 0.05.wait;};
 		};
 	}.play();
 };
@@ -108,9 +105,6 @@ Synth(\splayer,[buf: ~crinkles.choose, looping: 1, rate: 0.9 + (0.5.rand)]);
 	}.play;
 };
 
-4.do {
-  ~loopall.( ~silences, {|x| Synth(\splayer,[buf: x, rate: 0.3+1.0.rand]); });
-};
 /*
 ~loopall.( ~crinkles, {|x| Synth(\splayer,[buf: x, rate: 0.3+1.0.rand]) });
 ~loopall.( ~scratches, {|x| Synth(\splayer,[buf: x, rate: 0.3+1.0.rand]) });
@@ -168,13 +162,21 @@ o.pops.remove;
 
 /* eval this at the start of the performance */
 
+
+
+
+4.do {
+  ~loopall.( ~silences, {|x| Synth(\splayer,[buf: x, rate: 0.3+1.0.rand, myvol: ~bal.()]); });
+};
+
+
+
 // Change this to 840
 r = Routine {
     780.0.wait;
     "Splotion".postln;
     ~popexplosion.().yield;
 }.play;
-
 
 fork {
     loop {
