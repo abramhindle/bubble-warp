@@ -61,7 +61,7 @@ SynthDef(\splayer, {
 ~crinklef = {
 	arg since=1000;
 	var amp = ~since.(since), myvol = ~bal.();
-	myvol.postln;
+	//myvol.postln;
 	Synth(\splayer,[buf: ~crinkles.choose, rate: 0.9 + (0.5.rand), amp: 0.5*amp, myvol: myvol]);
 };
 
@@ -69,7 +69,8 @@ SynthDef(\splayer, {
 	Routine {
 		fork {
 			1000.do{
-				Synth(\splayer,[\buf, ~pops.choose]); 0.05.wait;};
+				Synth(\splayer,[\buf, ~pops.choose, \myvol: (~bal.())]); 0.05.wait;
+			};
 		};
 	}.play();
 };
